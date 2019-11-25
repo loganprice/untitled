@@ -1,7 +1,8 @@
 package config
 
 import (
-	"github.com/loganprice/avalanche/config/env"
+	"github.com/loganprice/untitled/config/file"
+	"github.com/loganprice/untitled/config/env"
 )
 
 // ConfService provides operations to read and unmashal config
@@ -16,6 +17,7 @@ const (
 
 var registeredSources = map[string]ConfService{
 	"defaultEnv": env.NewConfig(),
+	"defaultFile": file.NewConfig(defaultFileName),
 }
 
 // RegisterSource gives the ability to add a new source to the default list of registered Sources

@@ -1,9 +1,8 @@
 package env
 
 import (
+	configutils "github.com/loganprice/untitled/config/utils"
 	"os"
-
-	configutils "github.com/loganprice/avalanche/config/utils"
 )
 
 // Config ...
