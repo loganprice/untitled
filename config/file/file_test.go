@@ -183,3 +183,31 @@ func TestConfig_Unmarshal(t *testing.T) {
 		})
 	}
 }
+
+func TestNewConfig(t *testing.T) {
+	type args struct {
+		fileLocations []string
+	}
+	tests := []struct {
+		name   string
+		args   args
+		expect *Config
+	}{
+		{
+			name: "working",
+			args: args{
+				fileLocations: []string{"/home/test.yml"},
+			},
+			expect: &Config{
+				Sources: []string{"/home/test.yml"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewConfig(tt.args.fileLocations...); !reflect.DeepEqual(got, tt.expect) {
+				t.Errorf("NewConfig() = %v, expect %v", got, tt.expect)
+			}
+		})
+	}
+}

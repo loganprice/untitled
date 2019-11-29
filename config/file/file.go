@@ -23,12 +23,6 @@ type file struct {
 	Data  []byte
 }
 
-// FromFile takes in an array of file locaations and inorder reads the files and unmarshals the bytes to
-// the target. Files in the array
-// func FromFile(target interface{}, fileLocations ...string) error {
-// 	temp := &Values{}
-// 	return temp.GetFileData(fileLocations...).UnmarshalFileData(target)
-
 func NewConfig(fileLocations ...string) *Config {
 	return &Config{
 		Sources: fileLocations,

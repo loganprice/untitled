@@ -26,7 +26,7 @@ func TestConfig_GetValues(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		setConstEnv(tt.desiredEnv, t)
+		SetConstEnv(tt.desiredEnv, t)
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Config{
 				values: tt.fields.values,
