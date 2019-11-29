@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"testing"
@@ -244,4 +245,24 @@ func Example() {
 		fmt.Println(err)
 	}
 	fmt.Println(temp)
+}
+
+func ExampleAddSource() {
+	config := NewSourceStore()
+	config.AddSource("env-default", env.NewConfig())
+}
+
+func ExampleLoad() {
+	type c struct {
+		Foo    int      `yaml:"foo" json:"foo,omitempty" env:"FOO" short_flag:"f" long_flag:"foo"`
+		Bar    string   `yaml:"bar" json:"bar,omitempty" short_flag:"b"  long_flag:"bar"`
+		FooBar []string `yaml:"foo_bar" json:"foo_bar,omitempty" flag:"fb"`
+	}
+
+	var temp c
+
+	config := NewDefaultSourceStore()
+	if err := config.Load("merge", &temp); err != nil {
+		log.Panic(err)
+	}
 }
