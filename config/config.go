@@ -1,42 +1,58 @@
 package config
 
 import (
-	"github.com/loganprice/untitled/config/file"
 	"github.com/loganprice/untitled/config/env"
+	"github.com/loganprice/untitled/config/flag"
 )
 
-// ConfService provides operations to read and unmashal config
-type ConfService interface {
-	GetValues() error
-	Unmarshal(interface{}) error
-}
-
-const (
-	defaultFileName = "application.yml"
+type (
+	// Sources stores the ConfServices that will be used
+	Sources map[string]ConfService
+	// ConfService provides operations to read and unmarshal config
+	ConfService interface {
+		GetValues() error
+		Unmarshal(interface{}) error
+	}
 )
 
-var registeredSources = map[string]ConfService{
-	"defaultEnv": env.NewConfig(),
-	"defaultFile": file.NewConfig(defaultFileName),
+// NewSourceStore Creates an empty Sources Object
+func NewSourceStore() Sources {
+	return Sources{}
 }
 
-// RegisterSource gives the ability to add a new source to the default list of registered Sources
-func RegisterSource(sourceName string, source ConfService) {
-	registeredSources[sourceName] = source
+// NewDefaultSourceStore Creates a Sources Object that contains config sources of flags and environment
+func NewDefaultSourceStore() Sources {
+	return Sources{
+		"args-default": flag.NewConfig(),
+		"env-default":  env.NewConfig(),
+	}
+}
+
+// AddSource gives the ability to add a new source to the default list of registered Sources
+func (s Sources) AddSource(sourceName string, source ConfService) Sources {
+	s[sourceName] = source
+	return s
 }
 
 // Load takes in arguments of the source that you want to pull config from and the object you want to
 // unmarshal that data into. There is a special source called "merge" which will unmarshal all your registered
-// source based on the persidence (File,  Env, Command Line Args, External)
-func Load(source string, target interface{}) error {
-	if source == "merge" {
-		for _, source := range registeredSources {
-			getAndUnmarshal(source, target)
+// source in alphabetical order. It is recommend that you name you prefix based on the precedence (Command Line Args, File,  Env,  External, nonTyped)
+func (s Sources) Load(source string, targets ...interface{}) error {
+	for _, target := range targets {
+		if source == "merge" {
+			orderedSources := setPrecedence(s)
+			for _, sourceKey := range orderedSources {
+				if err := getAndUnmarshal(s[sourceKey], target); err != nil {
+					return err
+				}
+			}
+			return nil
 		}
-		return nil
+		if err := getAndUnmarshal(s[source], target); err != nil {
+			return err
+		}
 	}
-	return getAndUnmarshal(registeredSources[source], target)
-
+	return nil
 }
 
 func getAndUnmarshal(c ConfService, target interface{}) error {
@@ -45,6 +61,3 @@ func getAndUnmarshal(c ConfService, target interface{}) error {
 	}
 	return c.Unmarshal(target)
 }
-
-// To DO - Create a function to sort ConfServices based on persidence
-// Load Priority - Default, File,  Env, Command Line Args, External
