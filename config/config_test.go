@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -225,4 +226,22 @@ func Test_getAndUnmarshal(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Example() {
+	type c struct {
+		Foo    int      `yaml:"foo" json:"foo,omitempty" env:"FOO" short_flag:"f" long_flag:"foo"`
+		Bar    string   `yaml:"bar" json:"bar,omitempty" short_flag:"b"  long_flag:"bar"`
+		FooBar []string `yaml:"foo_bar" json:"foo_bar,omitempty" flag:"fb"`
+	}
+
+	var temp c
+
+	err := NewDefaultSourceStore().
+		AddSource("file-default", file.NewConfig("application-base.yml", "application-prod.yaml")).
+		Load("merge", &temp)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(temp)
 }
