@@ -247,12 +247,12 @@ func Example() {
 	fmt.Println(temp)
 }
 
-func ExampleAddSource() {
+func ExampleSources_AddSource() {
 	config := NewSourceStore()
 	config.AddSource("env-default", env.NewConfig())
 }
 
-func ExampleLoad() {
+func ExampleSources_Load() {
 	type c struct {
 		Foo    int      `yaml:"foo" json:"foo,omitempty" env:"FOO" short_flag:"f" long_flag:"foo"`
 		Bar    string   `yaml:"bar" json:"bar,omitempty" short_flag:"b"  long_flag:"bar"`
